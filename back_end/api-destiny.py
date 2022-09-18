@@ -32,6 +32,8 @@ session.fetch_token(
     authorization_response=redirect_response,
 )
 
+# test ting og sager
+
 #all requests need an api key
 additional_headers = {'X-API-KEY': os.getenv('API_KEY')}
 
