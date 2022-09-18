@@ -27,8 +27,8 @@ additional_headers = {'X-API-KEY': api_key}
 def main():
     response = session.get(url=get_user_details_endpoint, headers=additional_headers)
     if response.reason != 'OK':
-        print(f"Authorization failed: {response.status_code}\n{response.reason}\n{response.text['Message']}")
-        authorization()
+        print(f"Authorization failed: {response.status_code}\n{response.reason}")
+        response = authorization()
 
     print(f"RESPONSE STATUS: {response.status_code}")
     print(f"RESPONSE REASON: {response.reason}")
@@ -48,6 +48,9 @@ def authorization():
         authorization_response=redirect_response,
     )
     response = session.get(url=get_user_details_endpoint, headers=additional_headers)
+
+    if response.reason == "OK":
+        open('token.txt', 'w').write(token_dict['access_token'])
     return response
 
 main()
