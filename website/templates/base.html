@@ -6,10 +6,11 @@
         <title>{% block title %}Index{% endblock %}</title>
     </head>
     <body>
+        {% block content%}
+        {% endblock %}
 
         <script>
             type="text/javascript"
-            //<!-- breh -->
             src="{{ url_for('static', filename='script.js') }}"
         </script>
     </body>
