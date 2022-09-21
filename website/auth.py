@@ -5,5 +5,7 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    data = '234879'
+    client = bungie_api.Client()
+    data = client.authenticate_user()
+    
     return render_template('auth/login.html', data=data)

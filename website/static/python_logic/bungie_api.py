@@ -4,101 +4,85 @@ from dotenv import load_dotenv
 import os
 import json
 
-#load environmental variables
-load_dotenv(dotenv_path='.env')
+class Client:
+        
+    #load environmental variables
+    load_dotenv(dotenv_path='.env')
 
-#authentication variables
-api_key = os.getenv('API_KEY')
-client_id = os.getenv('CLIENT_ID')
-# token_dict = open('token.txt').readline()
-redirect_response = None
+    #authentication variables
+    api_key = os.getenv('API_KEY')
+    client_id = os.getenv('CLIENT_ID')
+    token_dict = None
+    redirect_response = None
 
-#urls/redirects
-base_auth_url = "https://www.bungie.net/en/OAuth/Authorize"
-redirect_url = "https://bungie.net"
-token_url = "https://www.bungie.net/platform/app/oauth/token/"
-get_user_details_endpoint = None
+    #urls/redirects
+    base_auth_url = "https://www.bungie.net/en/OAuth/Authorize"
+    redirect_url = "https://bungie.net"
+    token_url = "https://www.bungie.net/platform/app/oauth/token/"
+    get_user_details_endpoint = None
 
-#session
-session = OAuth2Session(client_id=client_id, redirect_uri=redirect_url)
+    #session
+    session = OAuth2Session(client_id=client_id, redirect_uri=redirect_url)
 
-#additional headers required for every request sent to the API
-'''HEADERS = {'X-API-KEY': api_key,
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': f'Bearer {token_dict}'}'''
+    #additional headers required for every request sent to the API
+    HEADERS = {'X-API-KEY': api_key,
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': f'Bearer {token_dict}'}
 
-def main():
-    response = session.get(url=get_user_details_endpoint)#, headers=HEADERS
-    if response.reason != 'OK':
-        print(f"Authorization failed: {response.status_code}\n{response.reason}")
-        response = response
+    def __init__(self):
+        pass
 
-    #write response to terminal and save it to a local file * TEMPORARY *
-    print(f"RESPONSE STATUS: {response.status_code}")
-    print(f"RESPONSE REASON: {response.reason}")
-    print(f"REPONSE TEXT: \n{response.text}")
-    open('data.json', 'a').write(response.text)
+    def main(self):
+        response = self.session.get(url=self.get_user_details_endpoint, headers=self.HEADERS)
+        if response.reason != 'OK':
+            print(f"Authorization failed: {response.status_code}\n{response.reason}")
+            response = response
 
-def get_user_details():
-    '''
-    Use this function to get relevant user deatails, such as:\n
-    Membership ID,\n
-    Membership Type,\n
-    as well as others.\n
+        #write response to terminal and save it to a local file * TEMPORARY *
+        print(f"RESPONSE STATUS: {response.status_code}")
+        print(f"RESPONSE REASON: {response.reason}")
+        print(f"REPONSE TEXT: \n{response.text}")
 
-    This data is used in a lot of GET & POST endpoints relevant only to a specific account.
-    '''
-    user_details_endpoint = 'https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/'
-    response = session.get(url=user_details_endpoint)#, headers=HEADERS
-    if response.reason != 'OK':
-        get_token()
-        response = response
-    
-    #dump json response to a local file * TEMPORARY *
-    json_object = json.dumps(response.json(), indent=2)
-    open('data.json', 'a').write(json_object)
+    def get_user_details(self):
+        '''
+        Use this function to get relevant user deatails, such as:\n
+        Membership ID,\n
+        Membership Type,\n
+        as well as others.\n
 
-def get_token():
-    '''
-    Stores an auth token in a local file, "token.txt"
-    '''
-    if os.path.isfile('token.txt'):
-        current_token = open('token.txt', 'r').readline()
-    
-    print(f'Auth failed. Click link below to authorize')
-    auth_link = session.authorization_url(base_auth_url)
-    print(f"Auth link: {auth_link[0]}")
+        This data is used in a lot of GET & POST endpoints relevant only to a specific account.
+        '''
 
-    #auth returns a code used in retrieving auth token
-    redirect_response = input("Insert redirect url incl. params: ")
+        user_details_endpoint = 'https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/'
+        response = self.session.get(url=user_details_endpoint, headers=self.HEADERS)
+        if response.reason != 'OK':
+            self.authenticate_user()
+            response = response
 
-    #returns an auth token
-    token_dict = session.fetch_token(
-        include_client_id=True,
-        client_id=client_id,
-        token_url=token_url,
-        authorization_response=redirect_response,
-    )
-    
-    #if a new token has been generated, store it locally * TEMPORARY *
-    if token_dict['access_token'] != current_token and current_token != None:
-        open('token.txt', 'w').write(token_dict['access_token'])
+    def authenticate_user(self):
+        '''
+        Authenticates a user.\n
+        Returns:\n
+        OAuth 2.0 token.
+        '''
 
-def test_function():
-    print(api_key)
+        print(f'Auth failed. Click link below to authorize')
+        auth_link = self.session.authorization_url(self.base_auth_url)
+        print(f"Auth link: {auth_link[0]}")
 
-if __name__ == '__main__':
-    # get_user_details()
-    #main()
+        #auth returns a code used in retrieving auth token
+        redirect_response = input("Insert redirect url incl. params: ")
 
-    with open('data.json') as f:
-        data = json.load(f)
-    print(data['Response']['destinyMemberships'][0]['membershipType'])
-    print(data['Response']['destinyMemberships'][0]['membershipId'])
+        #returns an auth token
+        token_dict = self.session.fetch_token(
+            include_client_id=True,
+            client_id=self.client_id,
+            token_url=self.token_url,
+            authorization_response=redirect_response,
+        )
+        
+        return token_dict['access_token']
 
-
-def mainfest_download():
-    r = requests.get('https://bungie.net/common/destiny2_content/json/en/DestinyInventoryItemDefinition-c749fcce-2388-496f-b5a6-4859830183e4.json')
-    json_object = json.dumps(r.json(), indent=2)
-    with open('Local Testing\\manifest.json', 'w') as f:
-        f.write(json_object)
+if __name__ == '__main__': # testing purposes
+    client = Client()
+    client.authenticate_user()
