@@ -10,3 +10,7 @@ def home():
     else:
         pass
     return render_template('views/index.html')
+
+@views.route('/overview', methods=['GET', 'POST'])
+def overview():
+    return render_template('views/overview.html')

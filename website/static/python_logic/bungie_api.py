@@ -66,13 +66,11 @@ class Client:
         OAuth 2.0 token.
         '''
 
-        print(f'Auth failed. Click link below to authorize')
         auth_link = self.session.authorization_url(self.base_auth_url)
-        print(f"Auth link: {auth_link[0]}")
-
         #auth returns a code used in retrieving auth token
-        redirect_response = input("Insert redirect url incl. params: ")
+        return auth_link[0]
 
+    def get_token(self, redirect_response):
         #returns an auth token
         token_dict = self.session.fetch_token(
             include_client_id=True,

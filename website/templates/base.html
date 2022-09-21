@@ -6,6 +6,13 @@
         <title>{% block title %}Index{% endblock %}</title>
     </head>
     <body>
+        <div id="navbar">
+            <div>
+                <a id="home" href="/overview">Home</a>
+                <a id="login" href="/login">Login</a>
+            </div>
+        </div>
+
         {% block content%}
         {% endblock %}
 

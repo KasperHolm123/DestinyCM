@@ -1,5 +1,16 @@
 {% extends 'base.html' %} {% block title %}Login{% endblock %}
 {% block content %}
 
+<form method="POST">
+    <button type="submit" name="auth_button" id="auth_button">Authenticate</button>
+</form>
+
+<form method="POST">
+    <button type="submit" name="login_button">Login</button>
+    <input name="redirect_input" id="redirect_input" type="text" placeholder="URL" value="{{ data }}"/>
+</form>
+{% if data != None %}
 {{ data }} <!-- displays a variable from this views backend -->
+{% endif %}
+
 {% endblock %}
