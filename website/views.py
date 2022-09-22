@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, session
 from .static.python_logic.api_handling import endpoints
 
 views = Blueprint('views', __name__)
@@ -10,19 +10,26 @@ def home():
 
 @views.route('/overview', methods=['GET', 'POST'])
 def overview():
+    #variables
     request_response = None
     character_id = None
+
+    #try getting current authorized account's membership details
     try:
-        membershipType, destinyMembershipId = client.get_account_type_id()
-    except Exception as e:
-        flash(str(e), category='error')
+        membershipType, destinyMembershipId = session['membershipType'], session['destinyMembershipId']
+    except:
+        flash('No account has been specified. Please login to continue', category='error')
+
     if request.method == 'POST':
+        #GET or POST endpoint
         if request.form.get('endpoint_btn') != None:
             try:
+                #GET account membership details
                 request_response = client.get_endpoint(\
                     f'https://www.bungie.net/Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=200')
                 character_id = request_response['Response']['characters']['data']
-            except Exception as e:
+                flash('Success', category='success')
+            except endpoints.ApiError as e:
                 flash(str(e), category='error')
         pass
 

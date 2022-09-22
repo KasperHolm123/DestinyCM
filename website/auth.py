@@ -1,5 +1,5 @@
 import webbrowser
-from flask import Flask, Blueprint, render_template, request, flash, url_for, redirect
+from flask import Flask, Blueprint, render_template, request, flash, url_for, redirect, session
 from .static.python_logic.api_handling import endpoints
 
 auth = Blueprint('auth', __name__)
@@ -18,9 +18,10 @@ def login():
         if request.form.get('auth_button') != None:
             try:
                 client.get_token(request.form.get('redirect_input'))
+                session['membershipType'], session['destinyMembershipId'] = client.get_account_type_id()
                 flash('Authentication successful', category='success')
                 return redirect(url_for('views.overview'))
-            except:
-                flash('Invalid authorization code.', category='error')
+            except Exception as e:
+                flash(str(e), category='error')
 
     return render_template('auth/login.html', re_response=request_response, data=redirect_url)
