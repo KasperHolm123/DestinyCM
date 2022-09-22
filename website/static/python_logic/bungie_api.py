@@ -12,7 +12,7 @@ class Client:
     #authentication variables
     api_key = os.getenv('API_KEY')
     client_id = os.getenv('CLIENT_ID')
-    token_dict = None
+    token_dict = open('website/static/python_logic/local_data/token.txt', 'r').readline()
     redirect_response = None
 
     #urls/redirects
@@ -58,6 +58,8 @@ class Client:
         if response.reason != 'OK':
             self.authenticate_user()
             response = response
+        
+        return response.text
 
     def authenticate_user(self):
         '''
@@ -65,7 +67,7 @@ class Client:
         Returns:\n
         OAuth 2.0 token.
         '''
-
+        
         auth_link = self.session.authorization_url(self.base_auth_url)
         #auth returns a code used in retrieving auth token
         return auth_link[0]
@@ -79,6 +81,9 @@ class Client:
             authorization_response=redirect_response,
         )
         
+        #save token to local storage
+        open('website/static/python_logic/local_data/token.txt', 'w').write(token_dict['access_token'])
+
         return token_dict['access_token']
 
 if __name__ == '__main__': # testing purposes

@@ -2,13 +2,21 @@
 {% block content %}
 
 <form method="POST">
-    <button type="submit" name="auth_button" id="auth_button">Authenticate</button>
+    <div>
+        <button class="btn btn-secondary" type="submit" name="request_auth_button" id="auth_button">Request Authentication</button>
+        <input class="form-control" name="redirect_input" id="redirect_input" type="text" placeholder="URL"/>
+        <button class="btn btn-secondary" type="submit" name="auth_button" id="auth_button">Authenticate</button>
+    </div>
 </form>
-
-<form method="POST">
-    <button  type="submit" name="login_button">Login</button>
-    <input name="redirect_input" id="redirect_input" type="text" placeholder="URL" value="{{ data }}"/>
+<br/>
+<form class="row" method="POST">
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit" name="login_button" id="login_button">Login</button>
+    </div>
 </form>
+<ul class="list-group">
+    <li class="list-group-item">{{ re_response }}</li>
+</ul>
 {% if data != None %}
 {{ data }} <!-- displays a variable from this views backend -->
 {% endif %}
