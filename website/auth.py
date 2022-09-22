@@ -18,11 +18,13 @@ def login():
         if request.form.get('auth_button') != None:
             try:
                 client.get_token(request.form.get('redirect_input'))
+                flash('Authentication successful', category='success')
+                return redirect(url_for('views.overview'))
             except:
                 flash('Invalid authorization code.', category='error')
 
         if request.form.get('login_button') != None:
             # request_response = client.get_account_type_id()
-            return redirect(url_for('views.overview'))
+            pass
 
     return render_template('auth/login.html', re_response=request_response, data=redirect_url)
