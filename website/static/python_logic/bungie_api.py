@@ -32,25 +32,19 @@ class Client:
     def __init__(self):
         pass
 
-    def main(self):
-        response = self.session.get(url=self.get_user_details_endpoint, headers=self.HEADERS)
+    def get_endpoint(self, endpoint: str):
+        response = self.session.get(url=endpoint, headers=self.HEADERS)
         if response.reason != 'OK':
+            raise AuthTokenError()
             print(f"Authorization failed: {response.status_code}\n{response.reason}")
-            response = response
+        return response.text
+        
 
-        #write response to terminal and save it to a local file * TEMPORARY *
-        print(f"RESPONSE STATUS: {response.status_code}")
-        print(f"RESPONSE REASON: {response.reason}")
-        print(f"REPONSE TEXT: \n{response.text}")
-
-    def get_user_details(self):
+    def get_account_type_id(self):
         '''
-        Use this function to get relevant user deatails, such as:\n
-        Membership ID,\n
-        Membership Type,\n
-        as well as others.\n
+        Use this function to get relevant user details.\n
 
-        This data is used in a lot of GET & POST endpoints relevant only to a specific account.
+        :returns: membershipType, membershipId
         '''
 
         user_details_endpoint = 'https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/'
@@ -59,7 +53,8 @@ class Client:
             self.authenticate_user()
             response = response
         
-        return response.text
+        return response.json()['Response']['destinyMemberships'][0]['membershipType'], \
+            response.json()['Response']['destinyMemberships'][0]['membershipId']
 
     def authenticate_user(self):
         '''
@@ -85,6 +80,12 @@ class Client:
         open('website/static/python_logic/local_data/token.txt', 'w').write(token_dict['access_token'])
 
         return token_dict['access_token']
+
+class AuthTokenError(Exception):
+    def __init__(self, message='Token invalid. Re-authenticate'):
+        self.message = message
+        super().__init__(self.message)
+        
 
 if __name__ == '__main__': # testing purposes
     client = Client()

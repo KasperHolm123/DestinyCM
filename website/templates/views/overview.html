@@ -1,5 +1,15 @@
 {% extends 'base.html' %} {% block title %}Overview{% endblock %}
 {% block content %}
-<h1>Overview</h1>
+<div class="h-100 bg-dark">
+    <form method="POST">
+        <div class="mb-5">
+            <button class="btn btn-primary" type="submit" name="endpoint_btn" id="endpoint_btn">Get endpoint</button>
+        </div>
+    </form>
+
+    <ul class="list-group mt-1">
+        <li class="list-group-item">{{ request_response }}</li>
+    </ul>
+</div>
 
 {% endblock %}
