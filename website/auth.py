@@ -1,9 +1,9 @@
 import webbrowser
 from flask import Flask, Blueprint, render_template, request, flash, url_for, redirect
-from .static.python_logic import bungie_api
+from .static.python_logic.api_handling import endpoints
 
 auth = Blueprint('auth', __name__)
-client = bungie_api.Client()
+client = endpoints.EndpointClient()
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -22,9 +22,5 @@ def login():
                 return redirect(url_for('views.overview'))
             except:
                 flash('Invalid authorization code.', category='error')
-
-        if request.form.get('login_button') != None:
-            # request_response = client.get_account_type_id()
-            pass
 
     return render_template('auth/login.html', re_response=request_response, data=redirect_url)
