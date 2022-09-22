@@ -17,7 +17,7 @@ def login():
 
         if request.form.get('auth_button') != None:
             try:
-                client.get_token(request.form.get('redirect_input'))
+                session['token'] = client.get_token(request.form.get('redirect_input'))
                 session['membershipType'], session['destinyMembershipId'] = client.get_account_type_id()
                 flash('Authentication successful', category='success')
                 return redirect(url_for('views.overview'))

@@ -17,6 +17,7 @@ def overview():
     #try getting current authorized account's membership details
     try:
         membershipType, destinyMembershipId = session['membershipType'], session['destinyMembershipId']
+        auth_token = session['token']
     except:
         flash('No account has been specified. Please login to continue', category='error')
 
@@ -33,4 +34,4 @@ def overview():
                 flash(str(e), category='error')
         pass
 
-    return render_template('views/overview.html', request_response=character_id)
+    return render_template('views/overview.html', request_response=character_id, auth_token=auth_token)
