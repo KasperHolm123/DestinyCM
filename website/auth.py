@@ -10,6 +10,7 @@ def login():
     redirect_url = None
     request_response = None
     if request.method == 'POST':
+        pass
         #run this code only if the request is sent by an element with name 'request_auth_button'
         if request.form.get('request_auth_button') != None:
             redirect_url = client.authenticate_user()
