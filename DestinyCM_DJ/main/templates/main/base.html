@@ -17,7 +17,7 @@
             </div>
         </nav>
         
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% comment %} {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
             {% if category == 'error' %}
@@ -33,7 +33,7 @@
             {% endif %}
             {% endfor %}
         {% endif %}
-        {% endwith %}
+        {% endwith %} {% endcomment %}
 
         <div class="h-100">
             {% block content%}

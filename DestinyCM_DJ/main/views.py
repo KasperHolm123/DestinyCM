@@ -5,5 +5,8 @@ from django.shortcuts import render
 def index(response):
     return render(response, 'main/base.html', {})
 
+def login(response):
+    return render(response, 'main/authentication/login.html', {})
+
 def overview(response):
-    return render(response, 'main/login.html', {})
+    return render(response, 'main/home/overview.html', {})
