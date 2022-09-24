@@ -2,6 +2,7 @@
 {% block content %}
 
 <form class="h-100" method="POST">
+    {% csrf_token %}
     <div class="bg-dark position-relative h-100">
         <div class="position-absolute">
             <div class="mb-3">
