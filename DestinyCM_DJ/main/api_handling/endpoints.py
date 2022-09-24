@@ -8,7 +8,7 @@ class EndpointClient:
 
     #authentication variables
     api_key = os.getenv('API_KEY')
-    client_id = os.getenv('CLIENT_ID', '41471')
+    client_id = os.getenv('CLIENT_ID')
     token_dict = None
     redirect_response = None
 
