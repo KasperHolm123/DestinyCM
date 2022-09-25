@@ -73,6 +73,7 @@ class EndpointClient:
         Takes a redirect URL argument to fetch an OAuth Token\n
         :returns: OAuth Token
         '''
+        
         #returns an auth token
         token_dict = self.session.fetch_token(
             include_client_id=True,
@@ -80,9 +81,6 @@ class EndpointClient:
             token_url=self.token_url,
             authorization_response=redirect_response,
         )
-
-        #save token to local storage
-        # open('website/static/python_logic/local_data/token.txt', 'w').write(token_dict['access_token'])
         return token_dict['access_token']
 
 class ApiError(Exception):

@@ -18,24 +18,6 @@
                 <a class="navbar-brand" id="login" href="/login">Login</a>
             </div>
         </nav>
-        
-        {% comment %} {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            {% if category == 'error' %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message}}
-                    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% else %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message}}
-                    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-            {% endfor %}
-        {% endif %}
-        {% endwith %} {% endcomment %}
         <div id="content" name="content" class="h-100">
             {% block content%}
             {% endblock %}
