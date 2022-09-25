@@ -1,6 +1,9 @@
+import os
+
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
-import os
+
+
 
 class EndpointClient:
     #load environmental variables
@@ -88,7 +91,10 @@ class ApiError(Exception):
         self.reason = reason
         self.status_code = status_code
         super().__init__(self.reason, self.status_code)
-        
+
+class ManifestDownload:
+    pass
+
 
 if __name__ == '__main__': # testing purposes
     client = EndpointClient()
