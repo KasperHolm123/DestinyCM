@@ -18,8 +18,8 @@ def overview(response):
 #endregion
 
 #region view related functions
-from .api_handling import endpoints
-client = endpoints.EndpointClient()
+from .bungie_api import destiny2_api
+client = destiny2_api.EndpointClient()
 def get_character_data(request):
     '''
     Makes an API call to request character data\n
@@ -36,7 +36,7 @@ def get_character_data(request):
                 request_response = client.get_endpoint(\
                     f'https://www.bungie.net/Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=200')
                 character_id = request_response['Response']['characters']['data']
-            except endpoints.ApiError as e:
+            except destiny2_api.ApiError as e:
                 print(f'breh: {str(e)}')
     
     return character_id
@@ -60,5 +60,4 @@ def get_authentication_token(request):
                 return True # redirect must be used in view function
             except Exception as e:
                 print(f'Error: {str(e)}')
-
 #endregion

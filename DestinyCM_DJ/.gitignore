@@ -1,0 +1,4 @@
+.env
+venv/
+__pycache__/
+main/bungie_api/bungie_manifest/current_destiny_manifest.sqlite3
