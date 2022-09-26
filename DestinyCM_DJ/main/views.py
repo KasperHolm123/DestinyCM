@@ -1,5 +1,6 @@
-from threading import local
 from django.shortcuts import render, redirect
+
+from main.bungie_api import api_client
 
 #region views
 def index(response):
@@ -12,18 +13,23 @@ def login(response):
     return render(response, 'main/authentication/login.html', {})
 
 def overview(response):
-    client.HEADERS['Authorization'] = f'Bearer {response.session["access_token"]}'
+    # I need to somehow pass the auth token to every api call made
+    HEADERS['Authorization'] = f'Bearer {response.session["authorization"]["access_token"]}'
     return render(response, 'main/home/overview.html', {
         'request_response': get_character_data(response)
     })
 #endregion
 
 #region view related functions
-from .bungie_api import destiny2_api
+from .bungie_api.api_client import ApiEndpointCaller, AccountCaller, BungieError
 from .bungie_api.bungie_manifest.destiny2_definitions import EndpointComponentTypes
+from .bungie_api.api_response_parser import ResponseParser
 
-global client
-client = destiny2_api.EndpointClient()
+#additional headers required for every request sent to the API
+global HEADERS
+HEADERS = {'X-API-KEY': api_client.api_key,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': None}
 
 def get_character_data(request):
     '''
@@ -35,11 +41,12 @@ def get_character_data(request):
     if request.method == 'POST' and 'endpoint_btn' in request.POST:
         endpoint = f'/Destiny2/{membershipType}/Profile/{destinyMembershipId}'
         component_type = EndpointComponentTypes.CHARACTERS.value
+        print(HEADERS)
         try:
             #GET account membership details
-            request_response = client.get_endpoint(endpoint, component_type)
-            return request_response['Response']['characters']['data']
-        except destiny2_api.ApiError as e:
+            request_response = ApiEndpointCaller.get_endpoint(HEADERS, endpoint, component_type)
+            return ResponseParser.parse_character_details(request_response)
+        except BungieError as e:
             print(e)
 
 def generate_authentication_link(request):
@@ -50,14 +57,14 @@ def generate_authentication_link(request):
     import webbrowser
 
     if request.method == 'POST' and 'request_auth_button' in request.POST:
-        webbrowser.open_new_tab(client.authenticate_user())
+        webbrowser.open_new_tab(AccountCaller.generate_authentication_link())
 
 def get_authorization_token(request):
     if request.method == 'POST' and 'auth_button' in request.POST:
         try:
-            request.session['access_token'] = client.get_token(request.POST['redirect_input'])
-            request.session['membershipType'], request.session['destinyMembershipId'] = client.get_account_type_id()
+            request.session['authorization'] = AccountCaller.get_token(request.POST["redirect_input"])
+            request.session['membershipType'], request.session['destinyMembershipId'] = AccountCaller.get_account_type_id(HEADERS)
             return True # redirect must be used in view function
-        except destiny2_api.ApiError as e:
+        except BungieError as e:
             print(e)
 #endregion
