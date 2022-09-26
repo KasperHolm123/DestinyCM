@@ -2,6 +2,7 @@ import os
 
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
+from .bungie_manifest.destiny2_definitions import EndpointComponentTypes
 
 
 
@@ -26,20 +27,17 @@ class EndpointClient:
 
     #additional headers required for every request sent to the API
     HEADERS = {'X-API-KEY': api_key,
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Authorization': f'Bearer {token_dict}'}
+               'Content-Type': 'application/x-www-form-urlencoded',
+               'Authorization': f'Bearer {token_dict}'}
 
-
-    def __init__(self, auth_token = None):
-        self.token_dict = auth_token
-        self.HEADERS['Authorization'] = self.token_dict
     
-    def get_endpoint(self, endpoint: str):
+    def get_endpoint(self, endpoint: str, component_type: EndpointComponentTypes):
         '''
         GET or POST endpoint.\n
         :raises: ApiError on exceptions.
         '''
-        response = self.session.get(url=endpoint, headers=self.HEADERS)
+        print(self.token_dict)
+        response = self.session.get(url=f'https://www.bungie.net/Platform/{endpoint}?components={component_type}', headers=self.HEADERS)
         #.get will always return a message, so it is requred to handle it here.
         if response.reason != 'OK':
             raise ApiError(response.reason, response.status_code)
@@ -67,9 +65,8 @@ class EndpointClient:
         OAuth 2.0 token.
         '''
         
-        auth_link = self.session.authorization_url(self.base_auth_url)
         #auth returns a code used in retrieving auth token
-        return auth_link[0]
+        return self.session.authorization_url(self.base_auth_url)[0]
 
     def get_token(self, redirect_response: str = None):
         '''
@@ -78,13 +75,12 @@ class EndpointClient:
         '''
         
         #returns an auth token
-        token_dict = self.session.fetch_token(
+        return self.session.fetch_token(
             include_client_id=True,
             client_id=self.client_id,
             token_url=self.token_url,
             authorization_response=redirect_response,
-        )
-        return token_dict['access_token']
+        )['access_token']
 
 class ApiError(Exception):
     def __init__(self, reason='Unknown error', status_code='Unknown error'):
@@ -92,8 +88,6 @@ class ApiError(Exception):
         self.status_code = status_code
         super().__init__(self.reason, self.status_code)
 
-class ManifestDownload:
-    pass
 
 
 if __name__ == '__main__': # testing purposes
