@@ -14,7 +14,7 @@ class EndpointClient:
     api_key = os.getenv('API_KEY')
     client_id = os.getenv('CLIENT_ID')
     token_dict = None
-    redirect_response = None
+    # redirect_response = None
 
     #urls/redirects
     base_auth_url = "https://www.bungie.net/en/OAuth/Authorize"
@@ -36,8 +36,8 @@ class EndpointClient:
         GET or POST endpoint.\n
         :raises: ApiError on exceptions.
         '''
-        print(self.token_dict)
-        response = self.session.get(url=f'https://www.bungie.net/Platform/{endpoint}?components={component_type}', headers=self.HEADERS)
+        url = f'https://www.bungie.net/Platform{endpoint}?components={component_type}'
+        response = self.session.get(url=url, headers=self.HEADERS)
         #.get will always return a message, so it is requred to handle it here.
         if response.reason != 'OK':
             raise ApiError(response.reason, response.status_code)
