@@ -5,9 +5,7 @@ def main():
     connection = sqlite3.connect('current_destiny_manifest.sqlite3')
 
     cursor = connection.execute('SELECT id, json FROM DestinyVendorDefinition WHERE id > 0')
-    response = []
-    for row in cursor:
-        response.append(json.loads(row[1]))
+    response = [json.loads(row[1]) for row in cursor]
 
     for object in response:
         if object['displayProperties']['name'] == 'Ada-1':

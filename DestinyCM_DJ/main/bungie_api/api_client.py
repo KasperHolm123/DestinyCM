@@ -1,4 +1,5 @@
 import os
+from sys import int_info
 
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
@@ -95,6 +96,15 @@ class AccountCaller:
         
         return ResponseParser.parse_membership_details(response.json())
         
+class BungieAccount:
+    
+    membership_details: dict
+    characeters: dict
+    
+    def __init__(self, membership_details: dict, characters: dict):
+        self.membership_details = membership_details
+        self.characeters = characters
+
 
 class BungieError(Exception):
     def __init__(self, reason='Unknown error', status_code='Unknown error'):

@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 
-from main.bungie_api import api_client
-
 #region views
 def index(response):
     return render(response, 'main/base.html', {})
@@ -21,6 +19,7 @@ def overview(response):
 #endregion
 
 #region view related functions
+from .bungie_api import api_client
 from .bungie_api.api_client import ApiEndpointCaller, AccountCaller, BungieError
 from .bungie_api.bungie_manifest.destiny2_definitions import EndpointComponentTypes
 from .bungie_api.api_response_parser import ResponseParser
@@ -41,7 +40,6 @@ def get_character_data(request):
     if request.method == 'POST' and 'endpoint_btn' in request.POST:
         endpoint = f'/Destiny2/{membershipType}/Profile/{destinyMembershipId}'
         component_type = EndpointComponentTypes.CHARACTERS.value
-        print(HEADERS)
         try:
             #GET account membership details
             request_response = ApiEndpointCaller.get_endpoint(HEADERS, endpoint, component_type)

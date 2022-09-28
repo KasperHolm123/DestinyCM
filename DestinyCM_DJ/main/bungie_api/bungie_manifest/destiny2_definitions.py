@@ -1,5 +1,8 @@
 import sqlite3
+import json
+
 from enum import Enum
+from ..api_client import BungieAccount, ApiEndpointCaller
 
 
 class EndpointComponentTypes(Enum):
@@ -27,6 +30,8 @@ class EndpointComponentTypes(Enum):
     VENDORSALES = 402
     KIOSKS = 500
 
+# Connection to manifest containing sqlite3 file.
+conn = sqlite3.connect('current_destiny_manifest.sqlite3')
 
 
 class DestinyPlaceDefinition:
@@ -171,7 +176,25 @@ class DestinyTraitCategoryDefinition:
     pass
 
 class DestinyVendorDefinition:
-    pass
+    
+    @staticmethod
+    def get_vendor(account: BungieAccount):
+        
+        cursor = conn.execute('SELECT id, json FROM DestinyVendorDefinition WHERE id > 0')
+        response = [json.loads(row[1]) for row in cursor]
+
+        for object in response:
+            if object['displayProperties']['name'] == 'Ada-1':
+                vendor_hash = object['hash'], object['displayProperties']['name']
+
+        conn.close()
+        
+        return f'/Destiny2/{account.membership_details["membershipType"]}/Profile/{account.membership_details["destinyMembershipId"]}/Character/{account.characeters["Hunter"]}/Vendors/{vendor_hash}/'
+        
+        
+    @staticmethod
+    def get_vendors():
+        pass
 
 class DestinyMilestoneDefinition:
     pass
