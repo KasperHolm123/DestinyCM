@@ -2,7 +2,7 @@ import sqlite3
 import json
 
 from enum import Enum
-from ..api_client import BungieAccount, ApiEndpointCaller
+# from ..api_client import BungieAccount, ApiEndpointCaller
 
 
 class EndpointComponentTypes(Enum):
@@ -178,7 +178,7 @@ class DestinyTraitCategoryDefinition:
 class DestinyVendorDefinition:
     
     @staticmethod
-    def get_vendor(account: BungieAccount):
+    def get_vendor(account):
         
         cursor = conn.execute('SELECT id, json FROM DestinyVendorDefinition WHERE id > 0')
         response = [json.loads(row[1]) for row in cursor]
@@ -188,9 +188,8 @@ class DestinyVendorDefinition:
                 vendor_hash = object['hash'], object['displayProperties']['name']
 
         conn.close()
-        
-        return f'/Destiny2/{account.membership_details["membershipType"]}/Profile/{account.membership_details["destinyMembershipId"]}/Character/{account.characeters["Hunter"]}/Vendors/{vendor_hash}/'
-        
+        print(f'/Destiny2/{account.membership_details["membershipType"]}/Profile/{account.membership_details["destinyMembershipId"]}/Character/{account.characeters["Hunter"]}/Vendors/{vendor_hash[0]}/')
+        return f'/Destiny2/{account.membership_details["membershipType"]}/Profile/{account.membership_details["destinyMembershipId"]}/Character/{account.characeters["Hunter"]}/Vendors/{vendor_hash[0]}/'
         
     @staticmethod
     def get_vendors():

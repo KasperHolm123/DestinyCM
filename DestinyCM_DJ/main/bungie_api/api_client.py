@@ -1,5 +1,4 @@
 import os
-from sys import int_info
 
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
@@ -13,6 +12,7 @@ load_dotenv(dotenv_path='.env')
 #authentication variables
 api_key = os.getenv('API_KEY')
 client_id = os.getenv('CLIENT_ID')
+auth_token = None
 
 #urls/redirects
 base_auth_url = "https://www.bungie.net/en/OAuth/Authorize"
@@ -22,41 +22,69 @@ token_endpoint = "https://www.bungie.net/platform/app/oauth/token/"
 #session
 session = OAuth2Session(client_id=client_id, redirect_uri=redirect_url)
 
-class ApiEndpointCaller:
-
-    # def __init__(self):
-    #     self.api_key = api_key
-    #     self.client_id = client_id
-    #     self.auth_token = auth_token
-    #     self.HEADERS = HEADERS
-    #     self.session = session
+HEADERS = {'X-API-KEY': api_key,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': f'Bearer {auth_token}'}
     
-    @staticmethod
-    def get_endpoint(HEADERS: dict, endpoint: str, component_type: EndpointComponentTypes):
-        '''
-        GET or POST endpoint.\n
-        :raises: ApiError on exceptions.
-        '''
-        
-        url = f'https://www.bungie.net/Platform{endpoint}?components={component_type}'
-        response = session.get(url=url, headers=HEADERS)
-        #.get will always return a message, so it is requred to handle it here.
-        if response.reason != 'OK':
-            raise BungieError(response.reason, response.status_code)
-        return response.json()
 
+def generic_api_call(HEADERS: dict, endpoint: str, component_type: EndpointComponentTypes):
+    '''
+    GET or POST endpoint.\n
+    :raises: ApiError on exceptions.
+    '''
+    
+    url = f'https://www.bungie.net/Platform{endpoint}?components={component_type}'
+    response = session.get(url=url, headers=HEADERS)
+    
+    #.get will always return a message, so it is requred to handle it here.
+    if response.reason != 'OK':
+        raise BungieError(response.reason, response.status_code)
+    return response.json()
 
-class AccountCaller:
+def get_characters():
+    '''
+    Makes an API call to request character data\n
+    :returns: character data (map)
+    '''
+    #variables
+    membershipType, destinyMembershipId = get_account_type_id()
+    endpoint = f'/Destiny2/{membershipType}/Profile/{destinyMembershipId}'
+    component_type = EndpointComponentTypes.CHARACTERS.value
+    
+    try:
+        #GET account membership details
+        request_response = generic_api_call(HEADERS, endpoint, component_type)
+        return ResponseParser.parse_character_details(request_response)
+    except BungieError as e:
+        print(e)
+
+def get_account_type_id():
+    '''
+    Use this function to get relevant user details.\n
+    :returns: membershipType, membershipId
+    '''
+
+    user_details_endpoint = 'https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/'
+    response = session.get(url=user_details_endpoint, headers=HEADERS)
+    
+    #.get will always return with a message, so it is requred to handle it here.
+    if response.reason != 'OK':
+        raise BungieError(response.reason)
+    
+    return ResponseParser.parse_membership_details(response.json())
+
+def build_account(auth_response: str): # TODO: connect a BungieAccount to be used in all api calls.
+    auth_token = auth_response
+    membership_details = get_account_type_id()
+    characters = get_characters()
+    
+    return BungieAccount(membership_details=membership_details, characters=characters)
+
+class AuthorizationHandler:
     '''
     This class is used to request data concerning
     the end-user's account.
     '''
-    
-    # def __init__(self):
-    #     self.session = session
-    #     self.base_auth_url = base_auth_url
-    #     self.client_id = client_id
-    #     self.token_endpoint = token_endpoint
     
     @staticmethod
     def generate_authentication_link():
@@ -80,21 +108,7 @@ class AccountCaller:
             token_url=token_endpoint,
             authorization_response=redirect_response,
         )
-    
-    @staticmethod  
-    def get_account_type_id(HEADERS: dict):
-        '''
-        Use this function to get relevant user details.\n
-        :returns: membershipType, membershipId
-        '''
 
-        user_details_endpoint = 'https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/'
-        response = session.get(url=user_details_endpoint, headers=HEADERS)
-        #.get will always return with a message, so it is requred to handle it here.
-        if response.reason != 'OK':
-            raise BungieError(response.reason)
-        
-        return ResponseParser.parse_membership_details(response.json())
         
 class BungieAccount:
     
