@@ -6,5 +6,6 @@ app_name = 'main' #define namespace for this project
 urlpatterns = [
     path('', index_view.index, name='index'),
     path('login/', login_view.login, name='login'),
+    path('logout/', login_view.logout, name='logout'),
     path('overview/', overview_view.overview, name='overview'),
 ]
